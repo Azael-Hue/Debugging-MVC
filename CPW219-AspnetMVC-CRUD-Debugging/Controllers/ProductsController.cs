@@ -15,9 +15,13 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
         public async Task<IActionResult> Index()
         {
+            // Get all products from the database
+            List<Product> products = await _context.Product.ToListAsync();
+
             return View(await _context.Product.ToListAsync());
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -28,15 +32,18 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             if (ModelState.IsValid)
             {
+
                 await _context.AddAsync(product);
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index)); 
             }
             return View(product);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            Product? product = await _context.Product.FindAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -59,8 +66,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            Product? product = await _context.Product.FindAsync(id);
 
             if (product == null)
             {
@@ -73,7 +79,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            Product? product = await _context.Product.FindAsync(id);
 
             if (product != null)
             {
